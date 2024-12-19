@@ -1,0 +1,9 @@
+FUNCIONES --> SNAKE_CASE 
+
+PARAMETROS DE FUNCIONES --> camelCase
+
+VARIABLES --> camelCase
+
+CLASES --> PascalCase
+
+CONSTANTES --> UPPERCASE

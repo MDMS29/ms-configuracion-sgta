@@ -1,0 +1,31 @@
+{
+  "name": "ms-sgta",
+  "version": "1.0.0",
+  "description": "proyecto Sistema de Gestion para Talleres Automovilisticos",
+  "main": "src/index.ts",
+  "types": "module",
+  "scripts": {
+    "dev": "nodemon --watch src --exec ts-node -r tsconfig-paths/register src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Moises Mazo",
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^9.16.0",
+    "@types/node": "^22.10.2",
+    "@types/pg": "^8.11.10",
+    "eslint": "^9.16.0",
+    "globals": "^15.13.0",
+    "nodemon": "^3.1.7",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0"
+  },
+  "dependencies": {
+    "@types/express": "^5.0.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  }
+}
