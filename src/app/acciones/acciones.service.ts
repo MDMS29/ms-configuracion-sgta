@@ -7,20 +7,19 @@ export class AccionesService extends BaseService<AccionesQuerys> {
         super(AccionesQuerys);
     }
 
-    async obtener_acciones() {
-        const acciones = await this.query.obtener_acciones()
+    async obtener_acciones(estado: string) {
+        const acciones = await this.query.obtener_acciones(estado)
 
         return { statusCode: REPONSES_CODES.OK, message: 'OK', data: acciones }
     }
 
-    async insertar_accion(accion: any) {
+    async insertar_actualizar_accion(accion: any) {
         accion.usuario_accion = 1
 
-        const response = await this.query.insertar_actualizar_accion(accion)
+        // PARSEAR DATA A STRING PARA PROCEDURE
+        accion = JSON.stringify(accion)
 
-        if (response.statusCode === REPONSES_CODES.OK) {
-            response.statusCode = REPONSES_CODES.CREATED
-        }
+        const response = await this.query.insertar_actualizar_accion(accion)
 
         return response
     }
@@ -33,6 +32,15 @@ export class AccionesService extends BaseService<AccionesQuerys> {
         }
 
         return { statusCode: REPONSES_CODES.OK, message: 'OK', data: accion }
+    }
+
+    async inactivar_activar_accion(id: string, estado: string) {
+        const data = { id, estado, usuario_accion: 1 }
+        const parametros = JSON.stringify(data)
+
+        const response = await this.query.inactivar_activar_accion(parametros)
+
+        return response
     }
 
 }
