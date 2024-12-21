@@ -15,6 +15,7 @@ export class AccionesRouter extends BaseRouter<AccionesController> {
         this.router.route(`/${this.subcarpeta}/:id`)
             .get((req, res) => this.controller.buscar_accion_id(req, res))
             .put((req, res) => this.controller.actualizar_accion(req, res))
+            .delete((req, res) => this.controller.inactivar_activar_accion(req, res))
     }
 
 }
