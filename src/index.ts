@@ -1,6 +1,7 @@
 import { ROUTES } from '@app/app.routes';
 import express from 'express';
 import { logger } from './helpers/logger';
+import cors from 'cors';
 
 class Server {
 
@@ -10,10 +11,12 @@ class Server {
 
     constructor() {
         this.app.use((req, _, next) => logger(req, _, next));
-        
+
+        this.app.disabled('x-powered-by');
+        this.app.use(cors())
         this.app.use(express.urlencoded({ extended: true }));
         this.app.use(express.json());
-        
+
         this.app.use("/api/v1", this.routes);
 
         this.listen();
