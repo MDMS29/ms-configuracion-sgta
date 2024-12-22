@@ -10,7 +10,12 @@ const esErrorCode = (statusCode: number) => statusCode >= REPONSES_CODES.BAD_REQ
 
 export const serverResponse = (res: any, response: IResponse) => {
     let error: boolean = false;
-    const { statusCode, message, data } = response;
+    let { statusCode, message, data } = response;
+    
+    if (statusCode === REPONSES_CODES.INTERNAL_SERVER_ERROR) {
+        console.log("🚀 ----- SERVER ERROR ----- 🚀 \n", message)
+        message = 'ERROR INTERNAL SERVER';
+    }
 
     error = esErrorCode(statusCode)
 
