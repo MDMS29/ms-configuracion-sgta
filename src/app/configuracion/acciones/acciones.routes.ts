@@ -4,7 +4,7 @@ import { AccionesController } from "./acciones.controller";
 export class AccionesRouter extends BaseRouter<AccionesController> {
 
     constructor() {
-        super(AccionesController, "acciones");
+        super(AccionesController, "configuracion/acciones");
     }
 
     routes(): void {
