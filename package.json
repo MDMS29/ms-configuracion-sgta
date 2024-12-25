@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "types": "module",
   "scripts": {
-    "dev": "nodemon --watch src --exec ts-node -r tsconfig-paths/register src/index.ts",
+    "dev": "clear && nodemon --watch src --exec ts-node -r tsconfig-paths/register src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Moises Mazo",

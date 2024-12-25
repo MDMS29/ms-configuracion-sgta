@@ -99,7 +99,7 @@ BEGIN
     EXCEPTION
         WHEN OTHERS THEN
             results := jsonb_build_object(
-                'statusCode', 500,
+                'statusCode', COALESCE((to_jsonb(SQLERRM)->>'statusCode')::int, 500),
                 'error', true,
                 'message', SQLERRM
             );
@@ -109,3 +109,100 @@ BEGIN
 END;
 $$;
 
+-- FUNCION ALMACENADA PARA BUSCAR UN MODULO POR ID
+CREATE OR REPLACE FUNCTION seguridad.fnc_buscar_modulo_id(i_params jsonb) RETURNS jsonb LANGUAGE plpgsql AS $$
+DECLARE
+    v_estado_activo integer := 1;
+    v_data_return jsonb;
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM seguridad.tbl_modulos WHERE id_modulo = (i_params->>'id')::integer) THEN
+        RETURN jsonb_build_object(
+            'statusCode', 404,
+            'error', true,
+            'message', 'No se ha encontrado el registro'
+        );
+    END IF;
+
+    v_data_return := (
+        SELECT to_jsonb(q) FROM (
+            SELECT
+                stm.id_modulo, stm.descripcion, stm.es_menu, stm.link,
+                (SELECT jsonb_agg(to_jsonb(q2)) FROM (
+                    SELECT
+                        tm.id_menu, tm.descripcion, tm.link
+                    FROM seguridad.tbl_menus tm
+                    WHERE tm.id_modulo = stm.id_modulo
+                    AND tm.id_estado = v_estado_activo
+                ) AS q2) AS menus
+            FROM seguridad.tbl_modulos stm
+            WHERE stm.id_modulo = (i_params->>'id')::integer
+            AND stm.id_estado = (i_params->>'estado')::integer
+            ORDER BY stm.id_modulo
+        ) AS q
+    );
+
+    RETURN jsonb_build_object(
+        'statusCode', 200,
+        'error', false,
+        'message', 'OK',
+        'data', COALESCE(v_data_return, '{}'::jsonb)
+    );
+END
+$$;
+
+
+-- PROCESO ALMACENADO PARA INACTIVAR Y ACTIVAR LAS MODULOS
+CREATE OR REPLACE PROCEDURE seguridad.prc_inactivar_activar_modulo(IN i_json_data jsonb,OUT results jsonb) LANGUAGE plpgsql AS $$
+DECLARE
+    v_tbl_modulos seguridad.tbl_modulos;
+
+    v_id integer := COALESCE((i_json_data->>'id'), '0')::integer;
+    v_estado integer := COALESCE((i_json_data->>'estado'), '0')::integer;
+    v_usuario integer := COALESCE((i_json_data->>'usuario_accion'), '0')::integer;
+
+    v_estado_activo integer := 1;
+BEGIN
+    BEGIN
+		IF NOT EXISTS (SELECT 1 FROM seguridad.tbl_modulos WHERE id_modulo = v_id) THEN
+            results := jsonb_build_object(
+                'statusCode', 400,
+                'error', true,
+                'message', 'No se encontró el módulo'
+            );
+            RETURN;
+        END IF;
+
+        UPDATE seguridad.tbl_modulos SET
+            id_estado = v_estado,
+            usuario_actua = v_usuario,
+            fecha_actua = now()
+        WHERE id_modulo = v_id
+        RETURNING * INTO v_tbl_modulos;
+
+        IF v_tbl_modulos.id_modulo IS NULL THEN
+            results := jsonb_build_object(
+                'statusCode', 400,
+                'error', true,
+                'message', 'No se pudo actualizar el módulo'
+            );
+        ELSE
+            results := jsonb_build_object(
+                'statusCode', 200,
+                'error', false,
+                'message', CASE WHEN v_estado = v_estado_activo THEN 'Se ha activado el registro' ELSE 'Se ha inactivado el registro' END
+            );
+        END IF;
+
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            results := jsonb_build_object(
+                'statusCode', 500,
+                'error', true,
+                'message', SQLERRM
+            );
+            RAISE NOTICE '%', SQLERRM;
+            RETURN;
+    END;
+END;
+$$;

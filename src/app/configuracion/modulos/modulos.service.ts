@@ -28,14 +28,14 @@ export class ModulosService extends BaseService<ModulosQuerys> {
         return response
     }
 
-    async buscar_modulo_id(id: string) {
-        const modulo = await this.query.buscar_modulo_id(id)
+    async buscar_modulo_id(params: string) {
+        const modulo = await this.query.buscar_modulo_id(params)
 
         if (!modulo) {
             return { statusCode: REPONSES_CODES.NOT_FOUND, message: 'No se ha encontro el registro', data: {} }
         }
 
-        return { statusCode: REPONSES_CODES.OK, message: 'OK', data: modulo }
+        return modulo
     }
 
     async inactivar_activar_modulo(id: string, estado: string) {
