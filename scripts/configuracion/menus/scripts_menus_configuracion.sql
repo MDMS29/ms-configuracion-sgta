@@ -13,6 +13,10 @@ DECLARE
     v_estado integer := (i_json_data->>'id_estado')::integer;
 BEGIN
     BEGIN
+        IF EXISTS (SELECT 1 FROM seguridad.tbl_menus WHERE id_menu <> v_id AND LOWER(link) = LOWER(v_link)) THEN
+            RAISE EXCEPTION '{"statusCode":400, "message": "Ya existe un menú con el nombre %"}', v_descripcion;
+        END IF;
+
         IF EXISTS (SELECT 1 FROM seguridad.tbl_menus WHERE id_menu = v_id) THEN
             UPDATE seguridad.tbl_menus
             SET descripcion = v_descripcion,
@@ -32,4 +36,5 @@ BEGIN
     END;
 END;
 $$;
+
 

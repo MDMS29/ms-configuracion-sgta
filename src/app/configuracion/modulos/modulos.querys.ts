@@ -16,9 +16,9 @@ export class ModulosQuerys {
         return res.rows[0].results
     }
 
-    async buscar_modulo_id(id: string) {
-        const res = await this.postgres.query('SELECT id_modulo, descripcion FROM seguridad.tbl_moduloes WHERE id_modulo = $1', [id])
-        return res?.rows[0]
+    async buscar_modulo_id(params: string) {
+        const res: any = await this.postgres.function(`seguridad.fnc_buscar_modulo_id('${params}')`)
+        return res?.rows[0].fnc_buscar_modulo_id
     }
 
     async inactivar_activar_modulo(parametros: string) {
