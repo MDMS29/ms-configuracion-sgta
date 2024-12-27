@@ -1,5 +1,6 @@
 import { IRequest } from "@common/interfaces/server.interface";
 import z from "zod";
+import { AccionDto } from "../acciones/acciones.dto";
 
 export interface ModuloDto extends IRequest {
     id_modulo: number;
@@ -7,6 +8,7 @@ export interface ModuloDto extends IRequest {
     es_menu: boolean;
     link: string;
     menus?: MenuDto[];
+    acciones?: RelacionModuloMenuAccionDto[];
 }
 
 export interface MenuDto {
@@ -14,8 +16,14 @@ export interface MenuDto {
     descripcion: string;
     link: string;
     id_estado: number;
+    acciones?: RelacionModuloMenuAccionDto[];
 }
 
+interface RelacionModuloMenuAccionDto extends AccionDto {
+    id_menu?: number;
+    id_modulo?: number;
+    id_estado: number;
+}
 
 export const MenuSchema = z.object({
     id_menu: z.number({

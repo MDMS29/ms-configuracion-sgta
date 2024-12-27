@@ -1,5 +1,10 @@
 import z from "zod";
 
+export interface AccionDto {
+    id_accion: number;
+    descripcion: string;
+}
+
 export const AccionSchema = z.object({
     id_accion: z.number({
         required_error: "Debe ingresar un identificador de la acción",
