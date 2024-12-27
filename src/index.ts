@@ -10,14 +10,12 @@ class Server {
     private routes: express.Router[] = ROUTES;
 
     constructor() {
-        this.app.use((req, _, next) => logger(req, _, next));
-
         this.app.disabled('x-powered-by');
         this.app.use(cors())
         this.app.use(express.urlencoded({ extended: true }));
         this.app.use(express.json());
 
-        this.app.use("/api/v1", this.routes);
+        this.app.use("/api/v1", logger, this.routes);
 
         this.listen();
     }
