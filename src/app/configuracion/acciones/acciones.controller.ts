@@ -2,6 +2,7 @@ import { BaseController } from "@common/bases/controller.base";
 import { AccionesService } from "./acciones.service";
 import { serverResponse } from "src/helpers/server-response";
 import { REPONSES_CODES } from "@common/constants/constantes";
+import { AccionSchema } from "./acciones.dto";
 
 export class AccionesController extends BaseController<AccionesService> {
     constructor() {
@@ -20,6 +21,9 @@ export class AccionesController extends BaseController<AccionesService> {
 
     async insertar_accion(req: any, res: any) {
         const accion = req.body
+
+        const validate = AccionSchema.safeParse(accion)
+        if (!validate.success) return serverResponse(res, { statusCode: REPONSES_CODES.BAD_REQUEST, message: validate.error.issues[0].message })
 
         const response = await this.service.insertar_actualizar_accion(accion)
 
@@ -41,6 +45,9 @@ export class AccionesController extends BaseController<AccionesService> {
         if (!id) return serverResponse(res, { statusCode: REPONSES_CODES.BAD_REQUEST, message: 'No se ha encontrado el identificador de la operación', data: {} })
 
         accion.id_accion = id
+
+        const validate = AccionSchema.safeParse(accion)
+        if (!validate.success) return serverResponse(res, { statusCode: REPONSES_CODES.BAD_REQUEST, message: validate.error.issues[0].message })
 
         const response = await this.service.insertar_actualizar_accion(accion)
 

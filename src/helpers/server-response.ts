@@ -13,9 +13,8 @@ export const serverResponse = (res: any, response: IResponse) => {
     let { statusCode, message, data } = response;
 
     if (statusCode === REPONSES_CODES.INTERNAL_SERVER_ERROR) {
-
-        let parseado = JSON?.parse(message)
         try {
+            let parseado = JSON?.parse(message)
 
             statusCode = parseado.statusCode
             message = parseado.message

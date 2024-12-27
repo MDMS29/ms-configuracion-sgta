@@ -1,5 +1,7 @@
 export const logger = (req: any, _: any, next: any) => {
-    console.log(`[${req.method}] ${req.originalUrl} - ${new Date().toISOString()} \n `)
+    let body: any = JSON.stringify(req.body) ?? ""
+
+    console.log(`[${req.method}] ${req.originalUrl} - ${new Date().toISOString()} \n ${body}`);
 
     next()
 };
