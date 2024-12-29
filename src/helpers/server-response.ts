@@ -20,7 +20,7 @@ export const serverResponse = (res: any, response: IResponse) => {
             message = parseado.message
 
         } catch (error) {
-            console.log("🚀 ----- SERVER ERROR ----- 🚀 \n", message)
+            console.log("🚀 ----- SERVER ERROR ----- 🚀 \n", message, "\n 🚀 ----- END SERVER ERROR ----- 🚀")
             message = 'ERROR INTERNAL SERVER';
         }
     }

@@ -42,9 +42,9 @@ export class AccionesController extends BaseController<AccionesService> {
         const { id } = req.params
         const accion = req.body
 
-        if (!id) return serverResponse(res, { statusCode: REPONSES_CODES.BAD_REQUEST, message: 'No se ha encontrado el identificador de la operación', data: {} })
+        if (!id || !Number(id)) return serverResponse(res, { statusCode: REPONSES_CODES.BAD_REQUEST, message: 'No se ha encontrado el identificador de la operación', data: {} })
 
-        accion.id_accion = id
+        accion.id_accion = Number(id)
 
         const validate = AccionSchema.safeParse(accion)
         if (!validate.success) return serverResponse(res, { statusCode: REPONSES_CODES.BAD_REQUEST, message: validate.error.issues[0].message })
