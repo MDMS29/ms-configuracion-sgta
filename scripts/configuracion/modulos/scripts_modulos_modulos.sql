@@ -26,7 +26,6 @@ END
 $$;
 
 -- PROCESO ALMACENADO PARA INSERTAR Y ACTUALIZAR LAS MODULOS
-
 CREATE OR REPLACE PROCEDURE seguridad.prc_insertar_actualizar_modulo(IN i_json_data jsonb,OUT results jsonb) LANGUAGE plpgsql AS $$
 DECLARE
     v_tbl_modulo seguridad.tbl_modulos;
@@ -37,6 +36,9 @@ DECLARE
     v_es_menu boolean := (i_json_data->>'es_menu')::boolean;
     v_link text := (i_json_data->>'link')::text;
     v_usuario integer := (i_json_data->>'usuario_accion')::integer;
+
+    v_acciones jsonb := (i_json_data->'acciones')::jsonb;
+    v_accion jsonb;
 
     v_menus jsonb := (i_json_data->>'menus')::jsonb;
     v_menu jsonb;
@@ -73,8 +75,6 @@ BEGIN
             RETURNING * INTO v_tbl_modulo;
         END IF;
 
-
-
         IF v_tbl_modulo.id_modulo IS NULL THEN
             results := jsonb_build_object(
                 'statusCode', 400,
@@ -86,6 +86,12 @@ BEGIN
                 FOR v_menu IN SELECT * FROM jsonb_array_elements(v_menus)
                 LOOP
                     CALL seguridad.prc_insertar_actualizar_menu(v_tbl_modulo.id_modulo, v_menu, v_usuario);
+                END LOOP;
+            ELSE    
+                -- INSERTAR LAS ACCIONES DEL MODULO
+                FOR v_accion IN SELECT * FROM jsonb_array_elements(v_acciones)
+                LOOP
+                    CALL seguridad.prc_insertar_actualizar_accion_modulo_menu(v_accion, v_tbl_modulo.id_modulo, null, v_usuario);
                 END LOOP;
             END IF;
 
@@ -110,6 +116,7 @@ END;
 $$;
 
 -- FUNCION ALMACENADA PARA BUSCAR UN MODULO POR ID
+
 CREATE OR REPLACE FUNCTION seguridad.fnc_buscar_modulo_id(i_params jsonb) RETURNS jsonb LANGUAGE plpgsql AS $$
 DECLARE
     v_estado_activo integer := 1;
@@ -127,13 +134,27 @@ BEGIN
         SELECT to_jsonb(q) FROM (
             SELECT
                 stm.id_modulo, stm.descripcion, stm.es_menu, stm.link,
-                (SELECT jsonb_agg(to_jsonb(q2)) FROM (
+                (SELECT COALESCE(jsonb_agg(to_jsonb(q2)), '[]'::jsonb) FROM (
                     SELECT
-                        tm.id_menu, tm.descripcion, tm.link
+                        tm.id_menu, tm.descripcion, tm.link,
+                        (SELECT COALESCE(jsonb_agg(to_jsonb(q3)), '[]'::jsonb) FROM (
+                            SELECT
+                                tam.id_accion_menu, tam.id_accion, tam.id_estado
+                            FROM seguridad.tbl_acciones_menus tam
+                            WHERE tam.id_menu = tm.id_menu
+                            AND tam.id_estado = v_estado_activo
+                        ) AS q3) AS acciones
                     FROM seguridad.tbl_menus tm
                     WHERE tm.id_modulo = stm.id_modulo
                     AND tm.id_estado = v_estado_activo
-                ) AS q2) AS menus
+                ) AS q2) AS menus,
+                (SELECT COALESCE(jsonb_agg(to_jsonb(q4)), '[]'::jsonb) FROM (
+                    SELECT
+                        tam.id_accion_menu, tam.id_accion, tam.id_estado
+                    FROM seguridad.tbl_acciones_menus tam
+                    WHERE tam.id_modulo = stm.id_modulo
+                    AND tam.id_estado = v_estado_activo
+                ) AS q4) AS acciones
             FROM seguridad.tbl_modulos stm
             WHERE stm.id_modulo = (i_params->>'id')::integer
             AND stm.id_estado = (i_params->>'estado')::integer
@@ -150,8 +171,8 @@ BEGIN
 END
 $$;
 
-
 -- PROCESO ALMACENADO PARA INACTIVAR Y ACTIVAR LAS MODULOS
+
 CREATE OR REPLACE PROCEDURE seguridad.prc_inactivar_activar_modulo(IN i_json_data jsonb,OUT results jsonb) LANGUAGE plpgsql AS $$
 DECLARE
     v_tbl_modulos seguridad.tbl_modulos;

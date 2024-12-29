@@ -49,7 +49,7 @@ export class ModulosController extends BaseController<ModulosService> {
 
         if (!id || !Number(id)) return serverResponse(res, { statusCode: REPONSES_CODES.BAD_REQUEST, message: 'No se ha encontrado el identificador de la operación', data: {} })
 
-        modulo.id_modulo = id
+        modulo.id_modulo = Number(id)
 
         const validate = ModuloSchema.safeParse(modulo)
         if (!validate.success) return serverResponse(res, { statusCode: REPONSES_CODES.BAD_REQUEST, message: validate.error.issues[0].message })
