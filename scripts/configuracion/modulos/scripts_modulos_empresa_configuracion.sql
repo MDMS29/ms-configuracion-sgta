@@ -5,6 +5,7 @@ DECLARE
     v_estado_activo integer := 1;
 
     v_id_modulo integer := COALESCE((i_json_data->>'id_modulo'), '0')::integer;
+	v_estado integer := (i_json_data->>'id_estado')::integer;
     v_id_modulo_empresa integer := (SELECT id_modulo_empresa FROM seguridad.tbl_modulos_empresas WHERE (id_empresa = i_empresa_id AND id_modulo = v_id_modulo));
 BEGIN 
     IF NOT EXISTS (SELECT 1 FROM seguridad.tbl_modulos WHERE id_modulo = v_id_modulo) THEN
@@ -18,7 +19,7 @@ BEGIN
         RETURNING * INTO v_tbl_modulos_empresa;
     ELSE
         UPDATE seguridad.tbl_modulos_empresas
-        SET id_estado=v_estado_activo, usuario_actua=i_usuario_accion, fecha_actua=now()
+        SET id_estado=v_estado, usuario_actua=i_usuario_accion, fecha_actua=now()
         WHERE id_modulo_empresa=v_id_modulo_empresa
         RETURNING * INTO v_tbl_modulos_empresa;
     END IF;
