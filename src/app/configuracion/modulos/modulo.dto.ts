@@ -61,5 +61,9 @@ export const ModuloSchema = z.object({
         required_error: "Debe ingresar un enlace valido para el módulo",
         invalid_type_error: "El enlace del módulo debe ser un texto",
     }).optional(),
+    id_estado: z.number({
+        required_error: "Debe ingresar un estado",
+        invalid_type_error: "El estado del módulo debe ser un número",
+    }).optional(),
     menus: z.array(MenuSchema).optional(),
 })
