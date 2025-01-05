@@ -16,3 +16,5 @@ export const DB_ESTADOS = {
     ACTIVO: 1,
     INACTIVO: 2
 }
+
+export const BCRYPT_SALT = 10

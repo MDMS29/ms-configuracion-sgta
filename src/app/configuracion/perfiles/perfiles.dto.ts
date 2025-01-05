@@ -7,7 +7,7 @@ export interface PerfilesDto {
     acciones: AccionesPerfil[];
 }
 
-interface AccionesPerfil {
+export interface AccionesPerfil {
     id_accion_perfil: number;
     id_accion_menu: number; // id de la accion
     id_estado: number;

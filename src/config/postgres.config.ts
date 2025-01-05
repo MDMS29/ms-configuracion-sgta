@@ -9,6 +9,18 @@ export class PostgresDB {
         this._pool = new Pool(POSTGRES_BD_CONFIG)
     }
 
+    async test() {
+        const client = await this._pool.connect()
+        try {
+            return client.query('SELECT NOW()')
+        } catch (error) {
+            console.log(error)
+            return false
+        } finally {
+            client.release()
+        }
+    }
+
     async query(query: string, params?: any) {
         const client = await this._pool.connect()
         try {

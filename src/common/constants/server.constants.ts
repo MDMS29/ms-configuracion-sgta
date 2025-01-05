@@ -8,5 +8,5 @@ export const POSTGRES_BD_CONFIG = {
     database: process.env.PGDATABASE,
     password: process.env.PGPASSWORD,
     port: Number(process.env.PGPORT),
-    ssl: true
+    ssl: false
 }

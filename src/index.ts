@@ -2,12 +2,15 @@ import { ROUTES } from '@app/app.routes';
 import express from 'express';
 import { logger } from './helpers/logger';
 import cors from 'cors';
+import { PostgresDB } from '@config/postgres.config';
 
 class Server {
 
     private app: express.Application = express();
     private port: number = Number(process.env.PORT ?? 3000);
     private routes: express.Router[] = ROUTES;
+
+    private postgres: PostgresDB = new PostgresDB();
 
     constructor() {
         this.app.disabled('x-powered-by');
@@ -23,6 +26,8 @@ class Server {
     listen() {
         this.app.listen(this.port, () => {
             console.log(`\n ****     ****  ********        ********   ********  **********     **\n/**/**   **/** **//////        **//////   **//////**/////**///     ****\n/**//** ** /**/**             /**        **      //     /**       **//**\n/** //***  /**/********* *****/*********/**             /**      **  //**\n/**  //*   /**////////**///// ////////**/**    *****    /**     **********\n/**   /    /**       /**             /**//**  ////**    /**    /**//////**\n/**        /** ********        ********  //********     /**    /**     /**\n//         // ////////        ////////    ////////      //     //      //\n\n Server is running on port 3000`);
+
+            this.postgres.test()
         });
     }
 }
