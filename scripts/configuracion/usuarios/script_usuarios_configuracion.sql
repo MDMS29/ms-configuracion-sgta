@@ -140,6 +140,7 @@ DECLARE
 
     v_id integer := COALESCE((i_params->>'id')::integer, 0);
     v_estado integer := COALESCE((i_params->>'estado')::integer, v_estado_activo);
+    v_usuario text := COALESCE((i_params->>'usuario')::text, '');
     v_ver_clave boolean := COALESCE((i_params->>'ver_clave')::boolean, false);
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM seguridad.tbl_usuarios WHERE id_usuario = v_id AND id_estado = v_estado) THEN
@@ -160,7 +161,7 @@ BEGIN
                         SELECT 
                             stpu.id_perfil_usuario, stpu.id_perfil, stpu.id_estado
                         FROM seguridad.tbl_perfiles_usuarios stpu
-                        WHERE stpu.id_usuario = 6 AND stpu.id_estado = 1
+                        WHERE stpu.id_usuario = v_id AND stpu.id_estado = v_estado
                     ) AS q2
                 ) AS perfiles,
                 (
@@ -168,12 +169,13 @@ BEGIN
                         SELECT 
                             stau.id_accion_usuario, stau.id_accion_perfil, stau.id_accion_perfil, stau.id_estado
                         FROM seguridad.tbl_acciones_usuarios stau
-                        WHERE stau.id_usuario = 6 AND stau.id_estado = 1
+                        WHERE stau.id_usuario = v_id AND stau.id_estado = v_estado
                     ) AS q3
                 ) AS acciones
             FROM seguridad.tbl_usuarios stu 
-            WHERE stu.id_usuario = 6 
-            AND stu.id_estado = 1
+            WHERE (v_id = 0 OR stu.id_usuario = v_id)
+            AND stu.id_estado = v_estado
+            AND (v_usuario = '' OR stu.usuario = v_usuario)
         ) AS q
     );
 
