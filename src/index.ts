@@ -20,6 +20,8 @@ class Server {
 
         this.app.use("/api/v1", logger, this.routes);
 
+        this.app.use((_, res) => { res.status(404).json({ statusCode: 404, message: 'No se ha encontrado la ruta' }) })
+
         this.listen();
     }
 
