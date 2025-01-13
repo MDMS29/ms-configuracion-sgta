@@ -133,7 +133,10 @@ $$;
 
 
 -- FUNCION ALMACENADA PARA BUSCAR UN USUARIO POR ID
-CREATE OR REPLACE FUNCTION seguridad.fnc_buscar_usuario_id(i_params jsonb) RETURNS jsonb LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION seguridad.fnc_buscar_usuario_id(i_params jsonb)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+AS $function$
 DECLARE
     v_estado_activo integer := 1;
     v_data_return jsonb;
@@ -143,7 +146,7 @@ DECLARE
     v_usuario text := COALESCE((i_params->>'usuario')::text, '');
     v_ver_clave boolean := COALESCE((i_params->>'ver_clave')::boolean, false);
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM seguridad.tbl_usuarios WHERE id_usuario = v_id AND id_estado = v_estado) THEN
+    IF NOT EXISTS (SELECT 1 FROM seguridad.tbl_usuarios WHERE (v_id = 0 OR id_usuario = v_id) AND (v_usuario = '' OR usuario = v_usuario) AND id_estado = v_estado) THEN
         RETURN jsonb_build_object(
             'statusCode', 404,
             'error', true,
@@ -186,7 +189,9 @@ BEGIN
         'data', COALESCE(v_data_return, '{}'::jsonb)
     );
 END
-$$;
+$function$
+;
+
 
 
 

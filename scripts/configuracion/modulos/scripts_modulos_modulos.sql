@@ -26,6 +26,7 @@ END
 $$;
 
 -- PROCESO ALMACENADO PARA INSERTAR Y ACTUALIZAR LAS MODULOS
+
 CREATE OR REPLACE PROCEDURE seguridad.prc_insertar_actualizar_modulo(IN i_json_data jsonb,OUT results jsonb) LANGUAGE plpgsql AS $$
 DECLARE
     v_tbl_modulo seguridad.tbl_modulos;
@@ -87,7 +88,7 @@ BEGIN
                 LOOP
                     CALL seguridad.prc_insertar_actualizar_menu(v_tbl_modulo.id_modulo, v_menu, v_usuario);
                 END LOOP;
-            ELSE    
+            ELSE
                 -- INSERTAR LAS ACCIONES DEL MODULO
                 FOR v_accion IN SELECT * FROM jsonb_array_elements(v_acciones)
                 LOOP
@@ -227,3 +228,60 @@ BEGIN
     END;
 END;
 $$;
+
+-- FUNCION ALMACENADA PARA OBTENER LOS MODULOS CON SUS MENUS Y ACCIONES
+
+CREATE OR REPLACE FUNCTION seguridad.fnc_obtener_modulos_menus_acciones() RETURNS jsonb LANGUAGE plpgsql AS $$
+DECLARE
+    data_return jsonb;
+    v_estado_activo integer := 1;
+BEGIN
+    data_return := (
+        SELECT jsonb_agg(to_jsonb(q)) FROM (
+            SELECT
+                stm.id_modulo, stm.descripcion, stm.es_menu, stm.link,
+                CASE WHEN es_menu THEN 
+                    (
+                        SELECT jsonb_agg(to_jsonb(q2)) FROM (
+                            SELECT
+                                tam.id_accion_menu, tam.id_accion, tam.id_estado, sta.descripcion
+                            FROM seguridad.tbl_acciones_menus tam
+                            INNER JOIN seguridad.tbl_acciones sta ON sta.id_accion = tam.id_accion
+                            WHERE tam.id_modulo = stm.id_modulo
+                            AND tam.id_estado = v_estado_activo
+                        ) AS q2
+                    )
+                END AS acciones,
+                CASE WHEN es_menu IS FALSE THEN
+                    (
+                        SELECT jsonb_agg(to_jsonb(q3)) FROM (
+                            SELECT
+                                tm.id_menu, tm.descripcion, tm.link,
+                                (SELECT jsonb_agg(to_jsonb(q4)) FROM (
+                                    SELECT
+                                        tam.id_accion_menu, tam.id_accion, tam.id_estado, sta.descripcion
+                                    FROM seguridad.tbl_acciones_menus tam
+									INNER JOIN seguridad.tbl_acciones sta ON sta.id_accion = tam.id_accion
+                                    WHERE tam.id_menu = tm.id_menu
+                                    AND tam.id_estado = v_estado_activo
+                                ) AS q4) AS acciones
+                            FROM seguridad.tbl_menus tm
+                            WHERE tm.id_modulo = stm.id_modulo
+                            AND tm.id_estado = v_estado_activo
+                        ) AS q3
+                    )
+                END AS menus
+            FROM seguridad.tbl_modulos stm
+            WHERE stm.id_estado = v_estado_activo
+        ) AS q
+    );
+
+    RETURN jsonb_build_object(
+        'statusCode', 200,
+        'error', false,
+        'message', 'OK',
+        'data', COALESCE(data_return, '[]'::jsonb)
+    );
+END
+$$;
+

@@ -1,7 +1,7 @@
 import { BaseRouter } from "@common/bases/router.base";
 import { AuthController } from "./auth.controller";
 
-export class AccionesRouter extends BaseRouter<AuthController> {
+export class AuthRouter extends BaseRouter<AuthController> {
 
     constructor() {
         super(AuthController, "auth");

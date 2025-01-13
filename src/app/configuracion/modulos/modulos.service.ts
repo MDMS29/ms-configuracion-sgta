@@ -8,8 +8,14 @@ export class ModulosService extends BaseService<ModulosQuerys> {
         super(ModulosQuerys);
     }
 
-    async obtener_modulos(estado: string) {
-        const modulos = await this.query.obtener_modulos(estado)
+    async obtener_modulos(estado: string, menus?: boolean) {
+        let modulos: any
+
+        if (menus) {
+            modulos = await this.query.obtener_modulos_menus_acciones()
+        } else {
+            modulos = await this.query.obtener_modulos(estado)
+        }
 
         return modulos
     }

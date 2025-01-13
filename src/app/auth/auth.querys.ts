@@ -1,5 +1,4 @@
 import { PostgresDB } from "@config/postgres.config";
-import { InicioSesionDto } from "./auth.dto";
 
 export class AuthQuerys {
 

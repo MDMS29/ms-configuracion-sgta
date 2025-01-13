@@ -16,7 +16,7 @@ export class AuthService extends BaseService<AuthQuerys> {
     }
 
     async inicio_sesion(body: InicioSesionDto) {
-        const params = JSON.stringify({ usuario: body.usuario, estado: DB_ESTADOS.ACTIVO, ver_clave: true })
+        const params = JSON.stringify({ usuario: body.usuario, ver_clave: true })
 
         const { data } = await this.UsuariosQuerys.buscar_usuario_id(params)
         if (!data) return { statusCode: REPONSES_CODES.UNAUTHORIZED, message: 'No se ha encontrado el usuario' }
@@ -26,7 +26,7 @@ export class AuthService extends BaseService<AuthQuerys> {
 
         const response = await this.query.inicio_sesion(data.id_usuario)
 
-        response.data.token = generar_token(data.id_usuario)
+        response.data.token = generar_token({ id: response.data.id_usuario })
 
         return response
     }

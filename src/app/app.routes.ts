@@ -1,3 +1,4 @@
+import { AuthRouter } from "./auth/auth.routes";
 import { AccionesRouter } from "./configuracion/acciones/acciones.routes";
 import { EmpresasRouter } from "./configuracion/empresas/empresas.routes";
 import { ModulosRouter } from "./configuracion/modulos/modulos.routes";
@@ -9,5 +10,6 @@ export const ROUTES = [
     new ModulosRouter().router,
     new EmpresasRouter().router,
     new PerfilesRouter().router,
-    new UsuariosRouter().router
+    new UsuariosRouter().router,
+    new AuthRouter().router
 ]

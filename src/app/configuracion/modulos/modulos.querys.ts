@@ -6,9 +6,14 @@ export class ModulosQuerys {
 
     constructor() { }
 
+    async obtener_modulos_menus_acciones() {
+        const res: any = await this.postgres.function('seguridad.fnc_obtener_modulos_menus_acciones()')
+        return res?.rows[0].fnc_obtener_modulos_menus_acciones
+    }
+
     async obtener_modulos(estado: string) {
         const res: any = await this.postgres.function('seguridad.fnc_obtener_modulos($1)', [estado])
-        return res?.rows[0].fnc_obtener_modulos
+        return res.rows[0].fnc_obtener_modulos
     }
 
     async insertar_actualizar_modulo(modulo: string) {

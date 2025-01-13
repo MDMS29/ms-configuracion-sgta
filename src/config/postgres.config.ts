@@ -40,6 +40,8 @@ export class PostgresDB {
         } catch (error) {
             console.log(error)
             return false
+        } finally {
+            client.release()
         }
     }
 
@@ -50,6 +52,8 @@ export class PostgresDB {
         } catch (error) {
             console.log(error)
             return false
+        } finally {
+            client.release()
         }
     }
 }
