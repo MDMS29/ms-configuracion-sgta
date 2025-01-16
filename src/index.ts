@@ -2,7 +2,18 @@ import { ROUTES } from '@app/app.routes';
 import express from 'express';
 import { logger } from './helpers/logger';
 import cors from 'cors';
-import { PostgresDB } from '@config/postgres.config';
+import { PostgresDB } from '@config/postgres.config'
+import { UsuarioDto } from '@app/configuracion/usuarios/usuarios.dto';
+
+
+declare global {
+    namespace Express {
+        interface Request {
+            usuario: UsuarioDto;
+        }
+    }
+}
+
 
 class Server {
 

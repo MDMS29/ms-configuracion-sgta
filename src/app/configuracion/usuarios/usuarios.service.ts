@@ -39,7 +39,7 @@ export class UsuariosService extends BaseService<UsuariosQuerys> {
         return response
     }
 
-    async buscar_usuario_id(id: string, estado: string) {
+    async buscar_usuario_id(id: string, estado?: string) {
         const params = JSON.stringify({ id, estado: estado ?? DB_ESTADOS.ACTIVO })
 
         const response = await this.query.buscar_usuario_id(params)
