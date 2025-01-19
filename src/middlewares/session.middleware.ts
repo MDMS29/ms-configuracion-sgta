@@ -22,8 +22,11 @@ export const sessionMiddleware = async (req: any, res: Response, next: NextFunct
         req.usuario = data
 
         next()
-    } catch (error) {
-        console.log('----- MIDDLEWARE ERROR -----\n', error, '\n----- MIDDLEWARE ERROR -----')
-        return serverResponse(res, { statusCode: 500, message: 'Error al validar sesión' })	
+    } catch (error: any) {
+        if (error.message.includes('jwt expired')) return serverResponse(res, { statusCode: 401, message: 'Inicie sesión para realizar esta acción' })
+
+        console.log('----- MIDDLEWARE ERROR -----\n', error, '\n----- FIN MIDDLEWARE ERROR -----')
+        
+        return serverResponse(res, { statusCode: 500, message: 'Error al validar sesión' })
     }
 }
